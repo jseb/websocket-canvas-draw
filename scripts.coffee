@@ -43,16 +43,20 @@ App.init = ->
 	Draw Events
 ###
 $('canvas').live 'drag dragstart dragend', (e) ->
-	type = e.handleObj.type
-	offset = $(this).offset()
-	
-	e.offsetX = e.layerX - offset.left
-	e.offsetY = e.layerY - offset.top
-	x = e.offsetX 
-	y = e.offsetY
-	App.draw(x,y,type)
-	App.socket.emit('drawClick', { x : x, y : y, type : type})
-	return
+       totalOffsetX = 0
+       totalOffsetY = 0
+       currentElement = e.currentTarget
+       type = e.handleObj.type
+       loop
+           totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft
+           totalOffsetY += currentElement.offsetTop - currentElement.scrollTop
+           currentElement = currentElement.offsetParent
+           break if not currentElement?
+       x = e.pageX - totalOffsetX
+       y = e.pageY - totalOffsetY
+       App.draw(x,y,type)
+       App.socket.emit('drawClick', { x : x, y : y, type : type})
+       return
 
 
 

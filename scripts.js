@@ -30,17 +30,28 @@
       }
     };
   };
+
   /*
   	Draw Events
   */
+
+
   $('canvas').live('drag dragstart dragend', function(e) {
-    var offset, type, x, y;
+    var currentElement, totalOffsetX, totalOffsetY, type, x, y;
+    totalOffsetX = 0;
+    totalOffsetY = 0;
+    currentElement = e.currentTarget;
     type = e.handleObj.type;
-    offset = $(this).offset();
-    e.offsetX = e.layerX - offset.left;
-    e.offsetY = e.layerY - offset.top;
-    x = e.offsetX;
-    y = e.offsetY;
+    while (true) {
+      totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
+      totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
+      currentElement = currentElement.offsetParent;
+      if (!(currentElement != null)) {
+        break;
+      }
+    }
+    x = e.pageX - totalOffsetX;
+    y = e.pageY - totalOffsetY;
     App.draw(x, y, type);
     App.socket.emit('drawClick', {
       x: x,
